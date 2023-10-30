@@ -1,5 +1,5 @@
 import { Eol } from 'index';
-import { O } from './format';
+import { O } from 'format';
 let line = 1;
 let EOL: Eol;
 const COMMENT = '#';

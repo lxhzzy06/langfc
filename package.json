@@ -11,8 +11,13 @@
 		"test": "tsc && node dist/index.js"
 	},
 	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"name": "langfc",
 	"description": "Generate .ts file from mcbe .lang file",
 	"packageManager": "yarn@4.0.0",
+	"version": "1.0.01",
+	"files": [
+		"dist/**/*"
+	],
 	"license": "MIT"
 }
