@@ -15,9 +15,10 @@
 	"name": "langfc",
 	"description": "Generate .ts file from mcbe .lang file",
 	"packageManager": "yarn@4.0.0",
-	"version": "1.0.01",
+	"version": "1.0.2",
 	"files": [
-		"dist/**/*"
+		"dist/**/*",
+		"mc_type.ts"
 	],
 	"license": "MIT"
 }

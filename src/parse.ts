@@ -1,12 +1,18 @@
-import { Eol } from 'index';
-import { O } from 'format';
+import { Eol } from './index';
+import { Tar, Line, Para } from './format';
 let line = 1;
 let EOL: Eol;
-const COMMENT = '#';
-const OBJ: O = {};
+const OBJ: Tar = {};
+type VT = Tar[keyof Tar];
+let EXCLUDE: Array<string | RegExp>;
 
-function set(keys: string[], t: [string, string, number]) {
-	let temp: O = OBJ;
+enum Token {
+	Comment = '##',
+	Para = 'Para'
+}
+
+function set(keys: string[], t: VT) {
+	let temp: Tar = OBJ;
 	for (let i = 0; i < keys.length; i++) {
 		const key = keys[i];
 		if (i === keys.length - 1) {
@@ -15,29 +21,56 @@ function set(keys: string[], t: [string, string, number]) {
 		} else if (!Reflect.get(temp, key)) {
 			Reflect.set(temp, key, {});
 		}
-		temp = Reflect.get(temp, key) as O;
+		temp = Reflect.get(temp, key) as Tar;
 	}
 }
 
-function parse_line(s: string, exclude?: string[]) {
-	if (s[0] === COMMENT) return;
+function parse_id_val(s: string): [string, string] | undefined {
+	if (s.startsWith(Token.Comment)) return;
 	const equal = s.indexOf('=');
-	if (equal < 0) throw Error('Not found the "=" sign at line ' + line);
+	if (equal < 0) throw Error('Not found the "=" sign at\n' + (line + 1) + ': ' + s + '\n');
 	const id = s.slice(0, equal);
-	if (exclude && exclude.includes(id)) {
-		return;
-	}
-	const keys = id.split('.');
-	const value = s.slice(equal + 1);
-	const x = value.match(/%s/g)?.length;
-	set(keys, [id, value, x as number]);
+	for (const e of EXCLUDE) if (typeof e === 'string' ? id === e : e.test(id)) return;
+	const val = s.slice(equal + 1).split('	##')[0];
+	return [id, val];
 }
 
-export function parse(lang: string, eol: Eol, exclude?: string[]) {
+export function parse(lang: string, eol: Eol, exclude?: Array<string | RegExp>) {
 	EOL = eol;
-	for (const s of lang.split(EOL).filter((v) => v.length)) {
-		parse_line(s, exclude);
-		line++;
+	EXCLUDE = exclude ?? [];
+	const lines = lang.split(EOL);
+	for (line = 0; line < lines.length; line++) {
+		let t: VT;
+		let keys: string[] = [];
+		const s = lines[line];
+		if (!s.length) continue;
+		if (s.startsWith('##/')) {
+			const argv = s.split(' ').slice(1);
+			switch (argv[0]) {
+				case Token.Para:
+					{
+						const n = line + Number(argv[2]) + 1;
+						const arr: Line[] = [];
+						const id = argv[1];
+						keys = id.split('.');
+						while (++line < n) {
+							const r = parse_id_val(lines[line]);
+							if (!r) continue;
+							arr.push(new Line(...r, r[1].match(/%s/g)?.length));
+						}
+						line++;
+						t = new Para(id, arr);
+					}
+					break;
+			}
+		} else {
+			const r = parse_id_val(s);
+			if (!r) continue;
+			const [id, val] = r;
+			keys = id.split('.');
+			t = new Line(id, val, val.match(/%s/g)?.length);
+		}
+		set(keys, t!);
 	}
 	return OBJ;
 }

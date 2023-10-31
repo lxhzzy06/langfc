@@ -1,45 +1,69 @@
-export type O = { [index: string]: O | [string, string, number] };
+import fs from 'fs';
+export type Tar = { [index: string]: Tar | mark };
 
-const TS = `import { RawMessage } from '@minecraft/server';
-type With<L extends number, A extends string[] = [string]> = A['length'] extends L ? A : With<L, [string, ...A]>;
-
-class Raw {
-	public id: string;
-	public raw: string;
-	constructor(id: string, raw: string) {
+export abstract class mark {
+	id: string;
+	constructor(id: string) {
 		this.id = id;
-		this.raw = raw;
+	}
+	abstract toString(): string;
+	abstract get comment(): string;
+}
+
+export class Line extends mark {
+	val: string;
+	x?: number;
+	constructor(id: string, val: string, x?: number) {
+		super(id);
+		this.val = val;
+		this.x = x;
+	}
+	toString() {
+		return this.x ? `new LineWith<${this.x}>("${this.id}", "${this.val}")` : `new Line("${this.id}", "${this.val}")`;
+	}
+	get comment() {
+		return this.val;
 	}
 }
 
-class RawText extends Raw {
-	public text(): RawMessage {
-		return { translate: this.id };
+export class Para extends mark {
+	lines: Line[];
+	constructor(id: string, lines: Line[]) {
+		super(id);
+		this.lines = lines;
+	}
+	toString() {
+		let _with = false;
+		const val: string[] = [];
+		for (const l of this.lines) {
+			if (l.x) _with = true;
+			val.push(l.toString());
+		}
+		return _with ? `new ParaWith("${this.id}", [${val}])` : `new Para("${this.id}", [${val}])`;
+	}
+	get comment() {
+		let s = '';
+		this.lines.forEach((v, i) => {
+			if (i) s += '\n*';
+			s += '@' + i + ' ';
+			s += v.comment;
+		});
+		return s;
 	}
 }
 
-class RawTextWithString<T extends number> extends Raw {
-	constructor(id: string, raw: string) {
-		super(id, raw);
-	}
-	public text(s: With<T> | RawMessage): RawMessage {
-		return { translate: this.id, with: s };
-	}
-}
-
-`;
+const TS = fs.readFileSync('mc_type.ts', { encoding: 'utf-8' });
 
 let out = '';
 
-function format_obj(obj: O) {
+function format_obj(obj: Tar) {
 	const arr = Object.entries(obj);
 	out += '{';
 	for (let i = 0; i < arr.length; i++) {
 		const [k, v] = arr[i];
-		if (v instanceof Array) {
-			const [id, value, x] = v;
-			out += `\n/**${value}*/\n"${k}":`;
-			out += x ? `new RawTextWithString<${x}>("${id}", "${value}")` : `new RawText("${id}", "${value}")`;
+		if (v instanceof mark) {
+			out += `\n/**${v.comment}*/\n"${k}":`;
+			out += v.toString();
 		} else {
 			out += `"${k}":`;
 			format_obj(v);
@@ -51,7 +75,7 @@ function format_obj(obj: O) {
 	out += '}';
 }
 
-export function format(obj: O) {
+export function format(obj: Tar) {
 	format_obj(obj);
 	return TS + 'export default ' + out;
 }

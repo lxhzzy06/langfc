@@ -1,5 +1,5 @@
-import { format } from 'format';
-import { parse } from 'parse';
+import { format } from './format';
+import { parse } from './parse';
 import * as fs from 'fs';
 
 export enum Eol {
@@ -10,7 +10,7 @@ export enum Eol {
 interface Options {
 	file: string;
 	dist: string;
-	exclude?: string[];
+	exclude?: Array<string | RegExp>;
 	eol?: Eol;
 }
 
@@ -20,3 +20,5 @@ export default function langfc(options: Options) {
 	const out = format(parse(content, eol ?? Eol.windows, exclude));
 	fs.writeFileSync(dist, out, { encoding: 'utf-8' });
 }
+
+langfc({ file: 'lang.lang', dist: 'lang.ts', exclude: [/pack.\w+/, /entity.\w+/] });

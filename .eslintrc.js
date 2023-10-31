@@ -10,7 +10,7 @@ module.exports = {
 		ecmaVersion: 'es2021'
 	},
 	plugins: ['@typescript-eslint'],
-	excludedFiles: '*.js',
+	excludedFiles: ['*.js'],
 	rules: {
 		'indent': ['error', 'tab'],
 		'linebreak-style': ['error', 'unix'],
