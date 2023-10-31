@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 export type Tar = { [index: string]: Tar | mark };
 
 export abstract class mark {
@@ -52,7 +53,7 @@ export class Para extends mark {
 	}
 }
 
-const TS = fs.readFileSync('mc_type.ts', { encoding: 'utf-8' });
+const TS = fs.readFileSync(path.join(__dirname, '../mc_type.ts'), { encoding: 'utf-8' });
 
 let out = '';
 
