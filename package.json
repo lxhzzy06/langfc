@@ -15,7 +15,7 @@
 	"name": "langfc",
 	"description": "Generate .ts file from mcbe .lang file",
 	"packageManager": "yarn@4.0.0",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"files": [
 		"dist/**/*",
 		"mc_type.ts"
