@@ -65,10 +65,9 @@ class ParaWith<T extends Array<Line | LineWith<any>>> {
 		this.val = val;
 	}
 	public text(w: ParaWithT<[...T]>): RawMessage {
-		let wi = 0;
 		const out: RawMessage[] = [];
 		const len = this.val.length;
-		for (let i = 0; i < len; i++) {
+		for (let i = 0, wi = 0; i < len; i++) {
 			const v = this.val[i];
 			out.push(v instanceof Line ? v.text() : v.text((w as any)[wi++]));
 			if (i !== len - 1) {
