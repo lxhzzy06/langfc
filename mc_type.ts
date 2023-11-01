@@ -53,7 +53,7 @@ class Para {
 				out.push(Para.LF);
 			}
 		}
-		return { rawtext: out };
+		return { rawtext: [{ rawtext: out }] };
 	}
 }
 
@@ -75,7 +75,7 @@ class ParaWith<T extends Array<Line | LineWith<any>>> {
 				out.push(Para.LF);
 			}
 		}
-		return { rawtext: out };
+		return { rawtext: [{ rawtext: out }] };
 	}
 }
 
