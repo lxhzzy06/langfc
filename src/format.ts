@@ -46,7 +46,7 @@ export class Para extends mark {
 		let s = '';
 		this.lines.forEach((v, i) => {
 			if (i) s += '\n*';
-			s += '@' + i + ' ';
+			s += `@${i + 1} `;
 			s += v.comment;
 		});
 		return s;
