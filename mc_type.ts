@@ -16,7 +16,7 @@ type ParaWithT<
 	? ParaWithT<T, [...S, WithT<C> | RawMessage], [any, ...I]>
 	: never;
 
-const enum Prefixes {}
+export const enum Prefixes {}
 
 abstract class Base<R> {
 	constructor(public readonly id: string, public readonly val: R) {}
