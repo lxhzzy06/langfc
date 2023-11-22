@@ -25,14 +25,14 @@ abstract class Base<R> {
 abstract class Raw<R> extends Base<R> {
 	public abstract text(): RawMessage;
 	send(prefix?: Prefixes, player?: Player) {
-		(player ?? world).sendMessage(prefix ? { translate: prefix as any, with: this.text() } : this.text());
+		(player ?? world).sendMessage(prefix ? { translate: prefix as any, with: { rawtext: [this.text()] } } : this.text());
 	}
 }
 
 abstract class RawWith<R, W> extends Base<R> {
 	public abstract text(w: W): RawMessage;
 	send(w: W, prefix?: Prefixes, player?: Player) {
-		(player ?? world).sendMessage(prefix ? { translate: prefix as any, with: this.text(w) } : this.text(w));
+		(player ?? world).sendMessage(prefix ? { translate: prefix as any, with: { rawtext: [this.text(w)] } } : this.text(w));
 	}
 }
 
