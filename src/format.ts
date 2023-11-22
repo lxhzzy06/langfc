@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 export type Tar = { [index: string]: Tar | mark };
+export type Prefixes = { [index: string]: { id: string; comment: string } };
 
 export abstract class mark {
 	id: string;
@@ -55,28 +56,44 @@ export class Para extends mark {
 
 const TS = fs.readFileSync(path.join(__dirname, '../mc_type.ts'), { encoding: 'utf-8' });
 
-let out = '';
+let obj_str = '';
 
 function format_obj(obj: Tar) {
 	const arr = Object.entries(obj);
-	out += '{';
+	obj_str += '{';
 	for (let i = 0; i < arr.length; i++) {
 		const [k, v] = arr[i];
 		if (v instanceof mark) {
-			out += `\n/**${v.comment}*/\n"${k}":`;
-			out += v.toString();
+			obj_str += `\n/**${v.comment}*/\n"${k}":`;
+			obj_str += v.toString();
 		} else {
-			out += `"${k}":`;
+			obj_str += `"${k}":`;
 			format_obj(v);
 		}
 		if (i !== arr.length - 1) {
-			out += ',';
+			obj_str += ',';
 		}
 	}
-	out += '}';
+	obj_str += '}';
 }
 
-export function format(obj: Tar) {
+function format_prefixes(prefixes: Prefixes) {
+	let prefixes_str = '';
+	const arr = Object.entries(prefixes);
+	prefixes_str += 'const enum Prefixes {';
+	for (let i = 0; i < arr.length; i++) {
+		const [k, v] = arr[i];
+		prefixes_str += `\n/**${v.comment}*/\n${k}=`;
+		prefixes_str += `'${v.id}'`;
+		if (i !== arr.length - 1) {
+			prefixes_str += ',';
+		}
+	}
+	prefixes_str += '}';
+	return prefixes_str;
+}
+
+export function format(obj: Tar, prefixes: Prefixes) {
 	format_obj(obj);
-	return TS + 'export default ' + out;
+	return TS + 'export default ' + obj_str + '\n' + format_prefixes(prefixes);
 }

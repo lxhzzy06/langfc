@@ -1,4 +1,6 @@
-import { RawMessage } from '@minecraft/server';
+import { Player, RawMessage, world } from '@minecraft/server';
+
+const LF: RawMessage = { text: '\n' };
 
 type WithT<L extends number, A extends string[] = [string]> = A['length'] extends L ? A : WithT<L, [string, ...A]>;
 
@@ -14,35 +16,39 @@ type ParaWithT<
 	? ParaWithT<T, [...S, WithT<C> | RawMessage], [any, ...I]>
 	: never;
 
-class Raw {
-	public id: string;
-	public val: string;
-	constructor(id: string, value: string) {
-		this.id = id;
-		this.val = value;
+const enum Prefixes {}
+
+abstract class Base<R> {
+	constructor(public readonly id: string, public readonly val: R) {}
+}
+
+abstract class Raw<R> extends Base<R> {
+	public abstract text(): RawMessage;
+	send(prefix?: Prefixes, player?: Player) {
+		(player ?? world).sendMessage(prefix ? { translate: prefix as any, with: this.text() } : this.text());
 	}
 }
 
-class Line extends Raw {
+abstract class RawWith<R, W> extends Base<R> {
+	public abstract text(w: W): RawMessage;
+	send(w: W, prefix?: Prefixes, player?: Player) {
+		(player ?? world).sendMessage(prefix ? { translate: prefix as any, with: this.text(w) } : this.text(w));
+	}
+}
+
+class Line extends Raw<string> {
 	public text(): RawMessage {
 		return { translate: this.id };
 	}
 }
 
-class LineWith<T extends number> extends Raw {
+class LineWith<T extends number> extends RawWith<string, WithT<T> | RawMessage> {
 	public text(w: WithT<T> | RawMessage): RawMessage {
 		return { translate: this.id, with: w };
 	}
 }
 
-class Para {
-	static LF: RawMessage = { text: '\n' };
-	public id: string;
-	public val: Line[];
-	constructor(id: string, val: Line[]) {
-		this.id = id;
-		this.val = val;
-	}
+class Para extends Raw<Line[]> {
 	public text(): RawMessage {
 		const out: RawMessage[] = [];
 		const len = this.val.length;
@@ -50,20 +56,14 @@ class Para {
 			const v = this.val[i];
 			out.push(v.text());
 			if (i !== len - 1) {
-				out.push(Para.LF);
+				out.push(LF);
 			}
 		}
 		return { rawtext: [{ rawtext: out }] };
 	}
 }
 
-class ParaWith<T extends Array<Line | LineWith<any>>> {
-	public id: string;
-	public val: T;
-	constructor(id: string, val: [...T]) {
-		this.id = id;
-		this.val = val;
-	}
+class ParaWith<T extends Array<Line | LineWith<any>>> extends RawWith<[...T], ParaWithT<[...T]>> {
 	public text(w: ParaWithT<[...T]>): RawMessage {
 		const out: RawMessage[] = [];
 		const len = this.val.length;
@@ -71,7 +71,7 @@ class ParaWith<T extends Array<Line | LineWith<any>>> {
 			const v = this.val[i];
 			out.push(v instanceof Line ? v.text() : v.text((w as any)[wi++]));
 			if (i !== len - 1) {
-				out.push(Para.LF);
+				out.push(LF);
 			}
 		}
 		return { rawtext: [{ rawtext: out }] };

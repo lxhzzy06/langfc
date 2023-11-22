@@ -17,6 +17,6 @@ interface Options {
 export default function langfc(options: Options) {
 	const { file, dist, exclude, eol } = options;
 	const content = fs.readFileSync(file, { encoding: 'utf-8' });
-	const out = format(parse(content, eol ?? Eol.windows, exclude));
+	const out = format(...parse(content, eol ?? Eol.windows, exclude));
 	fs.writeFileSync(dist, out, { encoding: 'utf-8' });
 }
