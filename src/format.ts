@@ -78,9 +78,8 @@ function format_obj(obj: Tar) {
 }
 
 function format_prefixes(prefixes: Prefixes) {
-	let prefixes_str = '';
+	let prefixes_str = 'export const enum Prefixes {';
 	const arr = Object.entries(prefixes);
-	prefixes_str += 'export const enum Prefixes {';
 	for (let i = 0; i < arr.length; i++) {
 		const [k, v] = arr[i];
 		prefixes_str += `\n/**${v.comment}*/\n${k}=`;
