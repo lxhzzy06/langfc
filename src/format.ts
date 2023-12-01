@@ -21,7 +21,7 @@ export class Line extends mark {
 		this.x = x;
 	}
 	toString() {
-		return this.x ? `new LineWith<${this.x}>("${this.id}", "${this.val}")` : `new Line("${this.id}", "${this.val}")`;
+		return this.x ? `new LineWith<${this.x}>(\`${this.id}\`, \`${this.val}\`)` : `new Line(\`${this.id}\`, \`${this.val}\`)`;
 	}
 	get comment() {
 		return this.val;
@@ -41,7 +41,7 @@ export class Para extends mark {
 			if (l.x) _with = true;
 			val.push(l.toString());
 		}
-		return _with ? `new ParaWith("${this.id}", [${val}])` : `new Para("${this.id}", [${val}])`;
+		return _with ? `new ParaWith(\`${this.id}\`, [${val}])` : `new Para(\`${this.id}\`, [${val}])`;
 	}
 	get comment() {
 		let s = '';
