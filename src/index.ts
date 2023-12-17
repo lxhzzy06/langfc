@@ -8,15 +8,29 @@ export enum Eol {
 }
 
 interface Options {
-	file: string;
+	input: string | string[];
 	dist: string;
 	exclude?: Array<string | RegExp>;
 	eol?: Eol;
 }
 
 export default function langfc(options: Options) {
-	const { file, dist, exclude, eol } = options;
-	const content = fs.readFileSync(file, { encoding: 'utf-8' });
-	const out = format(...parse(content, eol ?? Eol.windows, exclude));
-	fs.writeFileSync(dist, out, { encoding: 'utf-8' });
+	const { input, dist, exclude, eol } = options;
+	if (typeof input === 'string') {
+		fs.readFile(input, (err, data) => {
+			if (err) throw err;
+			const out = format(...parse([data.toString()], eol ?? Eol.windows, exclude));
+			fs.writeFileSync(dist, out, { encoding: 'utf-8' });
+		});
+	} else {
+		const out = format(
+			...parse(
+				input.map((f) => fs.readFileSync(f).toString()),
+				eol ?? Eol.windows,
+				exclude
+			)
+		);
+		fs.writeFileSync(dist, out, { encoding: 'utf-8' });
+	}
 }
+

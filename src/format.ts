@@ -56,25 +56,25 @@ export class Para extends mark {
 
 const TS = fs.readFileSync(path.join(__dirname, '../mc_type.ts'), { encoding: 'utf-8' });
 
-let obj_str = '';
+let out = '';
 
 function format_obj(obj: Tar) {
 	const arr = Object.entries(obj);
-	obj_str += '{';
+	out += '{';
 	for (let i = 0; i < arr.length; i++) {
 		const [k, v] = arr[i];
 		if (v instanceof mark) {
-			obj_str += `\n/**${v.comment}*/\n"${k}":`;
-			obj_str += v.toString();
+			out += `\n/**${v.comment}*/\n"${k}":`;
+			out += v.toString();
 		} else {
-			obj_str += `"${k}":`;
+			out += `"${k}":`;
 			format_obj(v);
 		}
 		if (i !== arr.length - 1) {
-			obj_str += ',';
+			out += ',';
 		}
 	}
-	obj_str += '}';
+	out += '}';
 }
 
 function format_prefixes(prefixes: Prefixes) {
@@ -94,5 +94,5 @@ function format_prefixes(prefixes: Prefixes) {
 
 export function format(obj: Tar, prefixes: Prefixes) {
 	format_obj(obj);
-	return TS + 'export default ' + obj_str + '\n' + format_prefixes(prefixes);
+	return TS + 'export default ' + out + '\n' + format_prefixes(prefixes);
 }

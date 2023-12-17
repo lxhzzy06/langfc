@@ -10,7 +10,7 @@
 	},
 	"scripts": {
 		"test": "jest --silent=false --verbose false",
-		"publish": "tsc && npm publish"
+		"pub": "tsc && npm publish"
 	},
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
