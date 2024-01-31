@@ -2,8 +2,8 @@
 	"compilerOptions": {
 		"target": "ESNext",
 		"lib": ["ESNext"],
-		"moduleResolution": "NodeNext",
-		"module": "NodeNext",
+		"moduleResolution": "Bundler",
+		"module": "ESNext",
 		"outDir": "dist",
 		"strict": true,
 		"noUnusedLocals": true,

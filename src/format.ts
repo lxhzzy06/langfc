@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 import path from 'path';
 export type Tar = { [index: string]: Tar | mark };
 export type Prefixes = { [index: string]: { id: string; comment: string } };
@@ -54,7 +55,7 @@ export class Para extends mark {
 	}
 }
 
-const TS = fs.readFileSync(path.join(__dirname, '../mc_type.ts'), { encoding: 'utf-8' });
+const TS = fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '../mc_type.ts'), { encoding: 'utf-8' });
 
 let out = '';
 

@@ -9,9 +9,10 @@
 		"typescript": "^5.2.2"
 	},
 	"scripts": {
-		"test": "jest --silent=false --verbose false",
+		"test": "NODE_OPTIONS=--experimental-vm-modules jest",
 		"pub": "tsc && npm publish"
 	},
+	"type": "module",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"name": "langfc",
