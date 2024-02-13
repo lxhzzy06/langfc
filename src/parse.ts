@@ -1,5 +1,5 @@
-import { Eol } from './index';
-import { Tar, Line, Para, Prefixes } from './format';
+import { Eol } from './index.js';
+import { Tar, Line, Para, Prefixes } from './format.js';
 let line = 1;
 let EOL: Eol;
 const OBJ: Tar = {};

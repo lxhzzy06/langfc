@@ -1,5 +1,5 @@
-import { format } from './format';
-import { parse } from './parse';
+import { format } from './format.js';
+import { parse } from './parse.js';
 import * as fs from 'fs';
 
 export enum Eol {
